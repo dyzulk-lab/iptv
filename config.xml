@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<widget xmlns="http://www.w3.org/ns/widgets" 
+        xmlns:tizen="http://tizen.org/ns/widgets" 
+        id="http://dyzulk-lab.github.io/iptv" 
+        version="1.0.0" 
+        viewmodes="maximized">
+    <tizen:application id="dyzulk0001.iptv" 
+                       exec="index.html" 
+                       screen-orientation="landscape" 
+                       required_version="5.5"/>
+    <name>Dyzulk IPTV</name>
+    <description>Modern IPTV Player for Samsung Smart TV (Tizen 5.5)</description>
+    <icon src="icon.png"/>
+    <content src="index.html"/>
+    <feature name="http://tizen.org/feature/screen.size.all"/>
+    <feature name="http://tizen.org/feature/network.internet"/>
+    <tizen:privilege name="http://developer.samsung.com/privilege/avplay"/>
+    <tizen:privilege name="http://tizen.org/privilege/tv.inputdevice"/>
+    <tizen:privilege name="http://tizen.org/privilege/internet"/>
+    <tizen:privilege name="http://tizen.org/privilege/application.launch"/>
+    <tizen:profile name="tv"/>
+    <tizen:setting screen-orientation="landscape" 
+                   context-menu="disable" 
+                   background-support="disable" 
+                   encryption="disable" 
+                   install-location="auto"/>
+</widget>

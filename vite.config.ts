@@ -5,10 +5,15 @@ import { defineConfig } from "vite"
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: "./",
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
       "@": resolve(import.meta.dirname, "./src"),
     },
+  },
+  build: {
+    target: "chrome69",
+    outDir: "dist",
   },
 })
