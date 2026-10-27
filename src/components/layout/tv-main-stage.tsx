@@ -20,10 +20,10 @@ export function TvMainStage() {
               <ListVideo className="h-4 w-4" /> Series
             </TabsTrigger>
             <TabsTrigger value="favorites" className="gap-2 px-5 py-2 text-sm">
-              <Star className="h-4 w-4" /> Favorit
+              <Star className="h-4 w-4" /> Favorites
             </TabsTrigger>
             <TabsTrigger value="settings" className="gap-2 px-5 py-2 text-sm">
-              <Settings className="h-4 w-4" /> Pengaturan
+              <Settings className="h-4 w-4" /> Settings
             </TabsTrigger>
           </TabsList>
         </Tabs>
@@ -35,14 +35,18 @@ export function TvMainStage() {
 
       {/* Main Preview Card */}
       <Card className="flex-1 overflow-hidden border-border/50 bg-card/60 backdrop-blur-xs flex items-center justify-center p-8">
-        <CardContent className="flex flex-col items-center justify-center text-center gap-4 max-w-lg">
-          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary border border-primary/20">
-            <Radio className="h-8 w-8 animate-pulse" />
+        <CardContent className="flex flex-col items-center justify-center text-center gap-5 max-w-lg">
+          <div className="relative flex h-20 w-20 items-center justify-center rounded-2xl bg-primary/10 border border-primary/20 shadow-lg shadow-primary/10">
+            <img
+              src="./logo.svg"
+              alt="tv-ku Icon"
+              className="h-12 w-12 object-contain"
+            />
           </div>
           <div>
-            <h2 className="text-2xl font-bold text-foreground">Siap Memuat Playlist M3U</h2>
-            <p className="text-sm text-muted-foreground mt-2">
-              Frontend UI dan tema dinamis telah terkonfigurasi. Coba tekan tombol <kbd className="px-1.5 py-0.5 rounded border border-border bg-muted font-mono text-xs">D</kbd> pada keyboard untuk mengganti tema Sun / Moon seketika.
+            <h2 className="text-2xl font-bold text-foreground">Ready to Stream IPTV</h2>
+            <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
+              TV interface and dual-theme engine are configured. Press <kbd className="px-1.5 py-0.5 rounded border border-border bg-muted font-mono text-xs font-semibold text-foreground">D</kbd> on your keyboard or TV remote to toggle Sun / Moon theme.
             </p>
           </div>
         </CardContent>

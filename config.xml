@@ -8,7 +8,7 @@
                        exec="index.html" 
                        screen-orientation="landscape" 
                        required_version="5.5"/>
-    <name>Dyzulk IPTV</name>
+    <name>tv-ku IPTV</name>
     <description>Modern IPTV Player for Samsung Smart TV (Tizen 5.5)</description>
     <icon src="icon.png"/>
     <content src="index.html"/>

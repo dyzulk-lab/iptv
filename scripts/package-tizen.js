@@ -6,9 +6,9 @@ import { fileURLToPath } from "node:url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, "..");
 const distDir = path.resolve(rootDir, "dist");
-const wgtOutput = path.resolve(rootDir, "dyzulk-iptv.wgt");
+const wgtOutput = path.resolve(rootDir, "tv-ku.wgt");
 
-console.log("==> Packaging Dyzulk IPTV for Samsung Tizen...");
+console.log("==> Packaging tv-ku IPTV for Samsung Tizen...");
 
 if (!fs.existsSync(distDir)) {
   console.error("Error: dist/ directory not found. Run 'npm run build' first.");
