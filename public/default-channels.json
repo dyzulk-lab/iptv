@@ -1,0 +1,79 @@
+{
+  "name": "tv-ku Default Channels",
+  "description": "Curated family-friendly public streams (no adult content)",
+  "lastUpdated": "2026-10-27",
+  "channels": [
+    {
+      "id": "nasa-tv",
+      "name": "NASA TV (Public)",
+      "url": "https://nasa-i.akamaihd.net/hls/live/253565/NASA-NTV1-Public/master.m3u8",
+      "logo": "https://i.imgur.com/kJpMaAU.png",
+      "group": "Science & Space",
+      "tvgId": "NasaTV.us"
+    },
+    {
+      "id": "dw-english",
+      "name": "DW News (English)",
+      "url": "https://dwamdstream104.akamaized.net/hls/live/2015525/dwstream104/index.m3u8",
+      "logo": "https://i.imgur.com/ANAiJMi.png",
+      "group": "News",
+      "tvgId": "DWEnglish.de"
+    },
+    {
+      "id": "france24-en",
+      "name": "France 24 (English)",
+      "url": "https://stream.france24.com/live/hls/afp-fr24-001-generic-live-offer-en_aes-hls-mq/index.m3u8",
+      "logo": "https://i.imgur.com/gLcTsJP.png",
+      "group": "News",
+      "tvgId": "France24English.fr"
+    },
+    {
+      "id": "aljazeera-en",
+      "name": "Al Jazeera English",
+      "url": "https://live-hls-web-aje.getaj.net/AJE/index.m3u8",
+      "logo": "https://i.imgur.com/dM7tXmR.png",
+      "group": "News",
+      "tvgId": "AlJazeeraEnglish.qa"
+    },
+    {
+      "id": "cgtn",
+      "name": "CGTN (English)",
+      "url": "https://news.cgtn.com/resource/live/english/cgtn-news.m3u8",
+      "logo": "https://i.imgur.com/QbZvl6V.png",
+      "group": "News",
+      "tvgId": "CGTNEnglish.cn"
+    },
+    {
+      "id": "nhk-world",
+      "name": "NHK World Japan",
+      "url": "https://nhkworld.webcdn.stream.ne.jp/www11/nhkworld-tv/domestic/hlslive/nhkworld_tc01/index.m3u8",
+      "logo": "https://i.imgur.com/7aE3n06.png",
+      "group": "News",
+      "tvgId": "NHKWorldJapan.jp"
+    },
+    {
+      "id": "big-buck-bunny",
+      "name": "Big Buck Bunny (Test 1080p)",
+      "url": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
+      "logo": "",
+      "group": "Test Streams",
+      "tvgId": ""
+    },
+    {
+      "id": "tears-of-steel",
+      "name": "Tears of Steel (Test 1080p)",
+      "url": "https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8",
+      "logo": "",
+      "group": "Test Streams",
+      "tvgId": ""
+    },
+    {
+      "id": "singtelhls",
+      "name": "Sintel (4K Test Loop)",
+      "url": "https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8",
+      "logo": "",
+      "group": "Test Streams",
+      "tvgId": ""
+    }
+  ]
+}
