@@ -31,6 +31,8 @@
     "@types/node": "^24",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/tizen-common-web": "^2.0.6",
+    "@types/tizen-tv-webapis": "^2.0.9",
     "@vitejs/plugin-react": "^6",
     "eslint": "^10",
     "eslint-plugin-react-hooks": "^7.1.1",
