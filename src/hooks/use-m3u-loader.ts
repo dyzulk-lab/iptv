@@ -1,6 +1,7 @@
 /** Hook to load channels from playlists.json config or fallback to default-channels.json */
 
 import { useState, useEffect, useCallback } from 'react';
+import { toast } from 'sonner';
 import type { Channel, ChannelGroup } from '@/types/iptv';
 import { ADULT_BLACKLIST } from '@/types/iptv';
 import { parseM3U } from '@/lib/iptv/m3u-parser';
@@ -62,6 +63,7 @@ export function useM3uLoader(): UseM3uLoaderResult {
       const parsed = parseM3U(text);
       applyChannels(parsed, url);
     } catch (err) {
+      toast.error('Failed to load playlist', { description: 'Check URL in playlists.json' });
       setError('Failed to load playlist from URL');
       console.error('[tv-ku] M3U load error:', err);
     } finally {

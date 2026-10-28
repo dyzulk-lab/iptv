@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 import Hls from 'hls.js';
+import { toast } from 'sonner';
 import { isTizenTV } from '@/lib/tizen/key-codes';
 import { avplayOpen, avplayPause, avplayResume, avplayStop } from '@/lib/tizen/avplay-engine';
 import type { PlayerStatus } from '@/types/player';
@@ -39,6 +40,7 @@ export function usePlayerEngine(): UsePlayerEngineResult {
         onPlaybackComplete: () => setStatus('idle'),
         onError: (err) => {
           console.error('[tv-ku] AVPlay error:', err);
+          toast.error('Stream unavailable', { description: String(err) });
           setStatus('error');
         },
       });
@@ -64,14 +66,20 @@ export function usePlayerEngine(): UsePlayerEngineResult {
         setStatus('playing');
       });
       hls.on(Hls.Events.ERROR, (_, data) => {
-        if (data.fatal) setStatus('error');
+        if (data.fatal) {
+          toast.error('Stream error', { description: data.type });
+          setStatus('error');
+        }
       });
     } else {
       // Direct MP4 or native HLS (Safari)
       video.src = url;
       video.play().catch(() => {});
       video.onplaying = () => setStatus('playing');
-      video.onerror = () => setStatus('error');
+      video.onerror = () => {
+        toast.error('Playback failed', { description: 'Stream could not be loaded' });
+        setStatus('error');
+      };
     }
   }, []);
 
