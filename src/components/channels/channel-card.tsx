@@ -62,8 +62,15 @@ export function ChannelCard({ channel, isActive, isFocused, onSelect }: ChannelC
 
       {/* Channel info */}
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-medium leading-snug">{channel.name}</p>
-        <p className="truncate text-xs text-muted-foreground">{channel.group || "General"}</p>
+        <div className="flex items-center gap-1.5">
+          {channel.number && (
+            <span className="shrink-0 font-mono text-[10px] font-semibold text-primary/90 bg-primary/10 px-1 py-0.5 rounded leading-none">
+              #{String(channel.number).padStart(3, '0')}
+            </span>
+          )}
+          <p className="truncate text-sm font-medium leading-snug">{channel.name}</p>
+        </div>
+        <p className="truncate text-xs text-muted-foreground mt-0.5">{channel.group || "Undefined"}</p>
       </div>
 
       {/* Playing indicator */}

@@ -2,6 +2,7 @@
 
 export interface Channel {
   id: string;
+  number?: number;
   name: string;
   url: string;
   logo?: string;
@@ -10,9 +11,17 @@ export interface Channel {
   tvgName?: string;
 }
 
+export type CategorySortMode = 'index' | 'az' | 'count';
+
 export interface ChannelGroup {
   name: string;
   channels: Channel[];
+}
+
+export interface ChannelsCatalog {
+  updatedAt: string;
+  totalChannels: number;
+  categories: ChannelGroup[];
 }
 
 export interface Playlist {

@@ -1,9 +1,9 @@
-/** TV sidebar — unified scrollable rail for playlists and categories with TV remote focus support */
+/** TV sidebar — unified scrollable rail for playlists, category indexing & sorting */
 
 import { cn } from "cn";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Radio, Tv } from "lucide-react";
-import type { ChannelGroup } from "@/types/iptv";
+import { Radio, Tv, ArrowDownAZ, Hash, Layers } from "lucide-react";
+import type { ChannelGroup, CategorySortMode } from "@/types/iptv";
 import type { PlaylistOption } from "@/hooks/use-m3u-loader";
 
 interface TvSidebarProps {
@@ -13,6 +13,8 @@ interface TvSidebarProps {
   groups: ChannelGroup[];
   activeGroup: string | null;
   onSelectGroup: (name: string | null) => void;
+  sortMode?: CategorySortMode;
+  onSelectSortMode?: (mode: CategorySortMode) => void;
   focusedIndex?: number;
 }
 
@@ -23,16 +25,18 @@ export function TvSidebar({
   groups,
   activeGroup,
   onSelectGroup,
+  sortMode = "index",
+  onSelectSortMode,
   focusedIndex,
 }: TvSidebarProps) {
   return (
-    <aside className="flex w-56 shrink-0 flex-col border-r border-border bg-sidebar select-none h-full overflow-hidden">
+    <aside className="flex w-60 shrink-0 flex-col border-r border-border bg-sidebar select-none h-full overflow-hidden">
       <ScrollArea className="flex-1 h-full">
         <div className="py-2">
           {/* 1. Playlists section */}
           {playlists.length > 0 && (
             <div className="pb-1">
-              <div className="flex items-center justify-between px-5 pb-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+              <div className="flex items-center justify-between px-4 pb-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
                 <span>Playlists</span>
                 <span className="text-[10px] tabular-nums font-mono opacity-70">
                   ({playlists.length})
@@ -46,17 +50,22 @@ export function TvSidebar({
                       key={pl.name}
                       onClick={() => onSelectPlaylist?.(pl.name)}
                       className={cn(
-                        "flex w-full items-center gap-3 px-5 py-2 text-sm font-medium transition-colors text-left outline-none cursor-pointer",
+                        "flex w-full items-center gap-2.5 px-4 py-2 text-xs font-medium transition-colors text-left outline-none cursor-pointer",
                         "text-sidebar-foreground",
                         isPlActive
-                          ? "bg-primary/10 text-primary border-r-2 border-primary"
+                          ? "bg-primary/10 text-primary border-r-2 border-primary font-semibold"
                           : "hover:bg-sidebar-accent"
                       )}
                     >
-                      <Tv className="h-4 w-4 shrink-0 opacity-60" />
+                      <Tv className="h-3.5 w-3.5 shrink-0 opacity-70" />
                       <span className="truncate flex-1">{pl.name}</span>
+                      {pl.isCatalog && (
+                        <span className="text-[9px] uppercase font-bold text-primary bg-primary/15 px-1 py-0.2 rounded">
+                          Catalog
+                        </span>
+                      )}
                       {pl.isDefault && (
-                        <span className="text-[10px] uppercase font-semibold text-muted-foreground bg-muted px-1 py-0.5 rounded">
+                        <span className="text-[9px] uppercase font-semibold text-muted-foreground bg-muted px-1 py-0.2 rounded">
                           Demo
                         </span>
                       )}
@@ -67,56 +76,113 @@ export function TvSidebar({
             </div>
           )}
 
-          {playlists.length > 0 && <div className="mx-5 my-2 border-t border-border" />}
+          {playlists.length > 0 && <div className="mx-4 my-2 border-t border-border" />}
 
-          {/* 2. Categories section */}
+          {/* 2. Categories & Sort Options */}
           <div>
-            <div className="flex items-center justify-between px-5 pt-1 pb-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-              <span>Categories</span>
-              <span className="text-[10px] tabular-nums font-mono opacity-70">
-                ({groups.length})
-              </span>
+            <div className="px-4 pt-1 pb-2">
+              <div className="flex items-center justify-between text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">
+                <span>Categories</span>
+                <span className="text-[10px] tabular-nums font-mono opacity-70">
+                  ({groups.length})
+                </span>
+              </div>
+
+              {/* Sorting mode toggle bar */}
+              {onSelectSortMode && (
+                <div className="flex items-center gap-1 bg-muted/60 p-0.5 rounded-md border border-border/50 text-[10px]">
+                  <button
+                    onClick={() => onSelectSortMode("index")}
+                    title="Smart Index Sort"
+                    className={cn(
+                      "flex-1 flex items-center justify-center gap-1 py-1 rounded transition-colors cursor-pointer",
+                      sortMode === "index"
+                        ? "bg-background text-foreground font-semibold shadow-xs"
+                        : "text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    <Layers className="h-3 w-3" />
+                    <span>Index</span>
+                  </button>
+                  <button
+                    onClick={() => onSelectSortMode("az")}
+                    title="Alphabetical A-Z"
+                    className={cn(
+                      "flex-1 flex items-center justify-center gap-1 py-1 rounded transition-colors cursor-pointer",
+                      sortMode === "az"
+                        ? "bg-background text-foreground font-semibold shadow-xs"
+                        : "text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    <ArrowDownAZ className="h-3 w-3" />
+                    <span>A–Z</span>
+                  </button>
+                  <button
+                    onClick={() => onSelectSortMode("count")}
+                    title="Channel Count Sort"
+                    className={cn(
+                      "flex-1 flex items-center justify-center gap-1 py-1 rounded transition-colors cursor-pointer",
+                      sortMode === "count"
+                        ? "bg-background text-foreground font-semibold shadow-xs"
+                        : "text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    <Hash className="h-3 w-3" />
+                    <span>Count</span>
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* All Channels option */}
             <button
               onClick={() => onSelectGroup(null)}
               className={cn(
-                "flex items-center gap-3 px-5 py-2.5 text-sm font-medium transition-colors text-left outline-none cursor-pointer",
+                "flex w-full items-center gap-2.5 px-4 py-2 text-xs font-medium transition-colors text-left outline-none cursor-pointer",
                 "text-sidebar-foreground",
                 activeGroup === null
-                  ? "bg-primary/10 text-primary border-r-2 border-primary"
+                  ? "bg-primary/10 text-primary border-r-2 border-primary font-semibold"
                   : "hover:bg-sidebar-accent"
               )}
             >
-              <Radio className="h-4 w-4 shrink-0" />
+              <Radio className="h-3.5 w-3.5 shrink-0" />
               <span className="flex-1">All Channels</span>
             </button>
 
             {/* Category list items */}
             <div className="py-0.5">
-              {groups.map((group, i) => (
-                <button
-                  key={group.name}
-                  onClick={() => onSelectGroup(group.name)}
-                  className={cn(
-                    "flex w-full items-center justify-between px-5 py-2 text-sm transition-colors text-left outline-none cursor-pointer",
-                    "text-sidebar-foreground",
-                    activeGroup === group.name
-                      ? "bg-primary/10 text-primary border-r-2 border-primary"
-                      : "hover:bg-sidebar-accent",
-                    focusedIndex === i && "outline-2 outline-offset-[-2px] outline-tv-focus bg-sidebar-accent"
-                  )}
-                >
-                  <div className="flex items-center gap-2.5 truncate flex-1 mr-2">
-                    <Radio className="h-4 w-4 shrink-0 opacity-60" />
-                    <span className="truncate">{group.name}</span>
-                  </div>
-                  <span className="text-xs tabular-nums text-muted-foreground shrink-0">
-                    {group.channels.length}
-                  </span>
-                </button>
-              ))}
+              {groups.map((group, i) => {
+                const isUndefinedGroup = group.name.toLowerCase() === "undefined";
+                const isGroupActive = activeGroup === group.name;
+
+                return (
+                  <button
+                    key={group.name}
+                    onClick={() => onSelectGroup(group.name)}
+                    className={cn(
+                      "flex w-full items-center justify-between px-4 py-2 text-xs transition-colors text-left outline-none cursor-pointer",
+                      "text-sidebar-foreground",
+                      isGroupActive
+                        ? "bg-primary/10 text-primary border-r-2 border-primary font-semibold"
+                        : "hover:bg-sidebar-accent",
+                      focusedIndex === i &&
+                        "outline-2 outline-offset-[-2px] outline-tv-focus bg-sidebar-accent"
+                    )}
+                  >
+                    <div className="flex items-center gap-2 truncate flex-1 mr-2">
+                      <span className="font-mono text-[9px] text-muted-foreground/60 w-3.5 text-right shrink-0">
+                        {i + 1}
+                      </span>
+                      <span className={cn("truncate", isUndefinedGroup && "italic opacity-80")}>
+                        {group.name}
+                      </span>
+                    </div>
+                    <span className="text-[11px] tabular-nums font-mono text-muted-foreground shrink-0">
+                      {group.channels.length}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>

@@ -3,7 +3,7 @@
     {
       "name": "Indonesia",
       "url": "https://iptv-org.github.io/iptv/countries/id.m3u",
-      "enabled": true
+      "enabled": false
     },
     {
       "name": "News",
