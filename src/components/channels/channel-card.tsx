@@ -1,5 +1,6 @@
-/** Channel card — TV-optimized tile with clear focus/active/playing states */
+/** Channel card — TV-optimized tile with auto-scroll on focus */
 
+import { useRef, useEffect } from "react";
 import { cn } from "cn";
 import type { Channel } from "@/types/iptv";
 
@@ -11,18 +12,25 @@ interface ChannelCardProps {
 }
 
 export function ChannelCard({ channel, isActive, isFocused, onSelect }: ChannelCardProps) {
+  const ref = useRef<HTMLButtonElement>(null);
+
+  // Auto-scroll focused card into view for keyboard/remote navigation
+  useEffect(() => {
+    if (isFocused && ref.current) {
+      ref.current.scrollIntoView({ block: "nearest", behavior: "smooth" });
+    }
+  }, [isFocused]);
+
   return (
     <button
+      ref={ref}
       onClick={() => onSelect(channel)}
       onKeyDown={(e) => e.key === "Enter" && onSelect(channel)}
       className={cn(
         "flex items-center gap-3 rounded-lg px-3.5 py-3 text-left transition-colors outline-none select-none",
         "bg-card text-card-foreground",
-        /* Focused state: high-visibility TV outline */
         isFocused && "outline-2 outline-offset-2 outline-tv-focus bg-tv-surface-elevated",
-        /* Active/playing state: subtle primary accent */
         isActive && "bg-primary/10 ring-1 ring-primary/30",
-        /* Default hover for mouse fallback */
         !isFocused && !isActive && "hover:bg-tv-surface-elevated"
       )}
     >
@@ -35,7 +43,8 @@ export function ChannelCard({ channel, isActive, isFocused, onSelect }: ChannelC
             className="h-full w-full object-contain"
             onError={(e) => {
               (e.target as HTMLImageElement).style.display = "none";
-              (e.target as HTMLImageElement).nextElementSibling?.classList.remove("hidden");
+              const next = (e.target as HTMLImageElement).nextElementSibling;
+              if (next) (next as HTMLElement).classList.remove("hidden");
             }}
           />
         ) : null}

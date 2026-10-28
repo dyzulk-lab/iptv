@@ -8,7 +8,7 @@
     {
       "name": "All Channels",
       "url": "https://iptv-org.github.io/iptv/index.m3u",
-      "enabled": true
+      "enabled": false
     },
     {
       "name": "News",
