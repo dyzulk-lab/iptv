@@ -1,13 +1,8 @@
 /** TV remote control and spatial navigation type definitions */
 
-export type FocusDirection = "up" | "down" | "left" | "right";
+export type FocusDirection = 'up' | 'down' | 'left' | 'right';
 
-export type NavSection =
-  | "header"
-  | "sidebar"
-  | "channel-grid"
-  | "player"
-  | "settings";
+export type NavSection = 'header' | 'sidebar' | 'channel-grid' | 'player' | 'settings';
 
 export interface FocusPosition {
   section: NavSection;

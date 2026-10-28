@@ -1,15 +1,15 @@
 /** Root application — assembles TV layout with sidebar, channel grid, and player */
 
-import { useState, useMemo, useCallback } from "react";
-import { TvHeader } from "@/components/layout/tv-header";
-import { TvSidebar } from "@/components/layout/tv-sidebar";
-import { ChannelGrid } from "@/components/channels/channel-grid";
-import { VideoStage } from "@/components/player/video-stage";
-import { useM3uLoader } from "@/hooks/use-m3u-loader";
-import { usePlayerEngine } from "@/hooks/use-player-engine";
-import { useTvKeys } from "@/hooks/use-tv-keys";
-import { useSpatialFocus } from "@/hooks/use-spatial-focus";
-import type { Channel } from "@/types/iptv";
+import { useState, useMemo, useCallback } from 'react';
+import { TvHeader } from '@/components/layout/tv-header';
+import { TvSidebar } from '@/components/layout/tv-sidebar';
+import { ChannelGrid } from '@/components/channels/channel-grid';
+import { VideoStage } from '@/components/player/video-stage';
+import { useM3uLoader } from '@/hooks/use-m3u-loader';
+import { usePlayerEngine } from '@/hooks/use-player-engine';
+import { useTvKeys } from '@/hooks/use-tv-keys';
+import { useSpatialFocus } from '@/hooks/use-spatial-focus';
+import type { Channel } from '@/types/iptv';
 
 export function App() {
   const { channels, groups, isLoading } = useM3uLoader();
@@ -36,15 +36,15 @@ export function App() {
       setShowPlayer(true);
       play(channel.url);
     },
-    [play]
+    [play],
   );
 
   // TV remote key bindings
   useTvKeys({
-    onUp: () => moveFocus("up"),
-    onDown: () => moveFocus("down"),
-    onLeft: () => moveFocus("left"),
-    onRight: () => moveFocus("right"),
+    onUp: () => moveFocus('up'),
+    onDown: () => moveFocus('down'),
+    onLeft: () => moveFocus('left'),
+    onRight: () => moveFocus('right'),
     onEnter: () => {
       if (filtered[focusIndex]) {
         handleSelectChannel(filtered[focusIndex]);
@@ -60,11 +60,7 @@ export function App() {
       <TvHeader />
 
       <div className="flex flex-1 overflow-hidden">
-        <TvSidebar
-          groups={groups}
-          activeGroup={activeGroup}
-          onSelectGroup={setActiveGroup}
-        />
+        <TvSidebar groups={groups} activeGroup={activeGroup} onSelectGroup={setActiveGroup} />
 
         <div className="flex flex-1 flex-col overflow-hidden">
           {showPlayer ? (

@@ -17,17 +17,26 @@ export interface ChannelGroup {
 
 export interface Playlist {
   name: string;
-  source: "builtin" | "url" | "xtream";
+  source: 'builtin' | 'url' | 'xtream';
   channels: Channel[];
   groups: ChannelGroup[];
   lastUpdated: number;
 }
 
-export type StreamFormat = "hls" | "mpegts" | "mp4" | "unknown";
+export type StreamFormat = 'hls' | 'mpegts' | 'mp4' | 'unknown';
 
 /** Adult content blacklist keywords for safe filtering */
 export const ADULT_BLACKLIST: string[] = [
-  "xxx", "adult", "18+", "porn", "erotic",
-  "nsfw", "red-light", "playboy", "hustler",
-  "penthouse", "brazzers", "bangbros",
+  'xxx',
+  'adult',
+  '18+',
+  'porn',
+  'erotic',
+  'nsfw',
+  'red-light',
+  'playboy',
+  'hustler',
+  'penthouse',
+  'brazzers',
+  'bangbros',
 ];

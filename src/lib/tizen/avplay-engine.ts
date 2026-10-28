@@ -1,6 +1,6 @@
 /** Samsung Tizen webapis.avplay hardware-accelerated video engine wrapper */
 
-import { isTizenTV } from "@/lib/tizen/key-codes";
+import { isTizenTV } from '@/lib/tizen/key-codes';
 
 export interface AvplayCallbacks {
   onBufferingStart?: () => void;
@@ -19,12 +19,14 @@ export function avplayOpen(url: string, callbacks: AvplayCallbacks): boolean {
 
   try {
     avplay.close();
-  } catch { /* ignore if nothing was open */ }
+  } catch {
+    /* ignore if nothing was open */
+  }
 
   try {
     avplay.open(url);
     avplay.setDisplayRect(0, 0, 1920, 1080);
-    avplay.setDisplayMethod("PLAYER_DISPLAY_MODE_FULL_SCREEN");
+    avplay.setDisplayMethod('PLAYER_DISPLAY_MODE_FULL_SCREEN');
 
     avplay.setListener({
       onbufferingstart: () => callbacks.onBufferingStart?.(),
@@ -39,7 +41,7 @@ export function avplayOpen(url: string, callbacks: AvplayCallbacks): boolean {
 
     avplay.prepareAsync(
       () => avplay.play(),
-      (err: string) => callbacks.onError?.(err)
+      (err: string) => callbacks.onError?.(err),
     );
 
     return true;
@@ -54,7 +56,9 @@ export function avplayPause(): void {
   if (!isTizenTV()) return;
   try {
     (window as any).webapis?.avplay?.pause();
-  } catch { /* ignore */ }
+  } catch {
+    /* ignore */
+  }
 }
 
 /** Resume the current avplay stream */
@@ -62,7 +66,9 @@ export function avplayResume(): void {
   if (!isTizenTV()) return;
   try {
     (window as any).webapis?.avplay?.play();
-  } catch { /* ignore */ }
+  } catch {
+    /* ignore */
+  }
 }
 
 /** Stop and close the current avplay stream */
@@ -72,5 +78,7 @@ export function avplayStop(): void {
     const avplay = (window as any).webapis?.avplay;
     avplay?.stop();
     avplay?.close();
-  } catch { /* ignore */ }
+  } catch {
+    /* ignore */
+  }
 }

@@ -1,9 +1,9 @@
 /** Scrollable channel grid filtered by active group */
 
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Skeleton } from "@/components/ui/skeleton";
-import { ChannelCard } from "@/components/channels/channel-card";
-import type { Channel } from "@/types/iptv";
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Skeleton } from '@/components/ui/skeleton';
+import { ChannelCard } from '@/components/channels/channel-card';
+import type { Channel } from '@/types/iptv';
 
 interface ChannelGridProps {
   channels: Channel[];
@@ -32,7 +32,7 @@ export function ChannelGrid({
 
   if (channels.length === 0) {
     return (
-      <div className="flex h-full items-center justify-center text-muted-foreground text-sm">
+      <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
         No channels found in this category
       </div>
     );

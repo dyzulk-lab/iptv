@@ -9,7 +9,7 @@ export const TV_KEYS = {
   ENTER: 13,
 
   // Tizen-specific
-  RETURN: 10009,  // Back button on Samsung remote
+  RETURN: 10009, // Back button on Samsung remote
 
   // Media Controls
   PLAY: 415,
@@ -49,24 +49,33 @@ export const TV_KEYS = {
 
 /** Keys that must be registered via tizen.tvinputdevice.registerKey() */
 export const TIZEN_REGISTER_KEYS: string[] = [
-  "MediaPlay",
-  "MediaPause",
-  "MediaStop",
-  "MediaFastForward",
-  "MediaRewind",
-  "MediaPlayPause",
-  "ChannelUp",
-  "ChannelDown",
-  "ColorF0Red",
-  "ColorF1Green",
-  "ColorF2Yellow",
-  "ColorF3Blue",
-  "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
+  'MediaPlay',
+  'MediaPause',
+  'MediaStop',
+  'MediaFastForward',
+  'MediaRewind',
+  'MediaPlayPause',
+  'ChannelUp',
+  'ChannelDown',
+  'ColorF0Red',
+  'ColorF1Green',
+  'ColorF2Yellow',
+  'ColorF3Blue',
+  '0',
+  '1',
+  '2',
+  '3',
+  '4',
+  '5',
+  '6',
+  '7',
+  '8',
+  '9',
 ];
 
 /** Check if the current runtime is Samsung Tizen TV */
 export function isTizenTV(): boolean {
-  return typeof window !== "undefined" && "tizen" in window;
+  return typeof window !== 'undefined' && 'tizen' in window;
 }
 
 /** Register TV-specific keys so Tizen OS doesn't capture them */
@@ -85,6 +94,6 @@ export function registerTizenKeys(): void {
       }
     }
   } catch {
-    console.warn("[tv-ku] Failed to register Tizen TV keys");
+    console.warn('[tv-ku] Failed to register Tizen TV keys');
   }
 }

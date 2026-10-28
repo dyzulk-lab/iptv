@@ -1,9 +1,9 @@
 /** Hook to load channels from default JSON or external M3U URL */
 
-import { useState, useEffect, useCallback } from "react";
-import type { Channel, ChannelGroup } from "@/types/iptv";
-import { ADULT_BLACKLIST } from "@/types/iptv";
-import { parseM3U } from "@/lib/iptv/m3u-parser";
+import { useState, useEffect, useCallback } from 'react';
+import type { Channel, ChannelGroup } from '@/types/iptv';
+import { ADULT_BLACKLIST } from '@/types/iptv';
+import { parseM3U } from '@/lib/iptv/m3u-parser';
 
 interface UseM3uLoaderResult {
   channels: Channel[];
@@ -42,14 +42,14 @@ export function useM3uLoader(): UseM3uLoaderResult {
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch("./default-channels.json");
+        const res = await fetch('./default-channels.json');
         const data = await res.json();
         const safe = filterSafe(data.channels as Channel[]);
         setChannels(safe);
         setGroups(groupChannels(safe));
       } catch (err) {
-        setError("Failed to load default channels");
-        console.error("[tv-ku] Default channels load error:", err);
+        setError('Failed to load default channels');
+        console.error('[tv-ku] Default channels load error:', err);
       } finally {
         setIsLoading(false);
       }
@@ -67,8 +67,8 @@ export function useM3uLoader(): UseM3uLoaderResult {
       setChannels(parsed);
       setGroups(groupChannels(parsed));
     } catch (err) {
-      setError("Failed to load playlist from URL");
-      console.error("[tv-ku] M3U load error:", err);
+      setError('Failed to load playlist from URL');
+      console.error('[tv-ku] M3U load error:', err);
     } finally {
       setIsLoading(false);
     }

@@ -1,12 +1,6 @@
 /** Video player state and quality type definitions */
 
-export type PlayerStatus =
-  | "idle"
-  | "loading"
-  | "buffering"
-  | "playing"
-  | "paused"
-  | "error";
+export type PlayerStatus = 'idle' | 'loading' | 'buffering' | 'playing' | 'paused' | 'error';
 
 export interface PlayerState {
   status: PlayerStatus;

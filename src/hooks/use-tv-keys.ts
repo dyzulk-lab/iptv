@@ -1,5 +1,5 @@
-import { useEffect, useCallback } from "react";
-import { TV_KEYS, registerTizenKeys } from "@/lib/tizen/key-codes";
+import { useEffect, useCallback } from 'react';
+import { TV_KEYS, registerTizenKeys } from '@/lib/tizen/key-codes';
 
 type KeyHandler = (keyCode: number) => void;
 
@@ -72,12 +72,12 @@ export function useTvKeys(handlers: UseTvKeysOptions) {
         e.stopPropagation();
       }
     },
-    [handlers]
+    [handlers],
   );
 
   useEffect(() => {
     registerTizenKeys();
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, [handleKeyDown]);
 }

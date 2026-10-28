@@ -1,21 +1,21 @@
-import { useEffect, useState } from "react";
-import { Wifi } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { ThemeToggle } from "@/components/theme/theme-toggle";
+import { useEffect, useState } from 'react';
+import { Wifi } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { ThemeToggle } from '@/components/theme/theme-toggle';
 
 export function TvHeader() {
-  const [time, setTime] = useState("");
+  const [time, setTime] = useState('');
 
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
       setTime(
-        now.toLocaleTimeString("en-US", {
-          hour: "2-digit",
-          minute: "2-digit",
-          second: "2-digit",
+        now.toLocaleTimeString('en-US', {
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
           hour12: false,
-        })
+        }),
       );
     };
 
@@ -35,14 +35,14 @@ export function TvHeader() {
         />
         <div>
           <h1 className="text-xl font-bold tracking-tight text-foreground">
-            tv-ku <span className="text-primary font-normal text-sm">IPTV</span>
+            tv-ku <span className="text-sm font-normal text-primary">IPTV</span>
           </h1>
           <p className="text-xs text-muted-foreground">Samsung Smart TV (Tizen 5.5)</p>
         </div>
       </div>
 
       {/* Center Shortcut Hint (English) */}
-      <div className="hidden md:flex items-center gap-2 rounded-full border border-border/40 bg-muted/40 px-3 py-1 text-xs text-muted-foreground">
+      <div className="hidden items-center gap-2 rounded-full border border-border/40 bg-muted/40 px-3 py-1 text-xs text-muted-foreground md:flex">
         <span>Press</span>
         <kbd className="rounded border border-border bg-background px-1.5 py-0.5 font-mono text-[10px] font-semibold text-foreground shadow-xs">
           D
@@ -52,13 +52,16 @@ export function TvHeader() {
 
       {/* Right Controls: Online Status, Clock, ThemeToggle */}
       <div className="flex items-center gap-4">
-        <Badge variant="outline" className="gap-1.5 border-emerald-500/30 bg-emerald-500/10 text-emerald-500">
+        <Badge
+          variant="outline"
+          className="gap-1.5 border-emerald-500/30 bg-emerald-500/10 text-emerald-500"
+        >
           <Wifi className="h-3 w-3 animate-pulse" />
           <span>Online</span>
         </Badge>
 
-        <div className="font-mono text-base font-semibold text-foreground tracking-wider">
-          {time || "00:00:00"}
+        <div className="font-mono text-base font-semibold tracking-wider text-foreground">
+          {time || '00:00:00'}
         </div>
 
         <ThemeToggle />
