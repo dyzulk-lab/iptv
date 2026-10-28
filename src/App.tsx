@@ -12,7 +12,7 @@ import { useSpatialFocus } from '@/hooks/use-spatial-focus';
 import type { Channel } from '@/types/iptv';
 
 export function App() {
-  const { channels, groups, isLoading } = useM3uLoader();
+  const { channels, groups, isLoading, playlistName } = useM3uLoader();
   const { status, play, videoRef } = usePlayerEngine();
   const [activeGroup, setActiveGroup] = useState<string | null>(null);
   const [activeChannel, setActiveChannel] = useState<Channel | null>(null);
@@ -57,7 +57,7 @@ export function App() {
 
   return (
     <div className="flex h-screen w-screen flex-col overflow-hidden bg-background text-foreground transition-colors duration-300">
-      <TvHeader />
+      <TvHeader playlistName={playlistName} channelCount={channels.length} />
 
       <div className="flex flex-1 overflow-hidden">
         <TvSidebar groups={groups} activeGroup={activeGroup} onSelectGroup={setActiveGroup} />

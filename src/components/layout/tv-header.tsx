@@ -1,10 +1,15 @@
-/** TV header bar — brand, clock, network status, and theme toggle */
+/** TV header bar — brand, playlist info, clock, and theme toggle */
 
 import { useEffect, useState } from "react";
 import { Wifi } from "lucide-react";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 
-export function TvHeader() {
+interface TvHeaderProps {
+  playlistName?: string | null;
+  channelCount?: number;
+}
+
+export function TvHeader({ playlistName, channelCount }: TvHeaderProps) {
   const [time, setTime] = useState("");
 
   useEffect(() => {
@@ -39,6 +44,16 @@ export function TvHeader() {
           </h1>
         </div>
       </div>
+
+      {/* Center: active playlist info */}
+      {playlistName && (
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <span className="font-medium text-foreground">{playlistName}</span>
+          {channelCount != null && channelCount > 0 && (
+            <span className="tabular-nums">· {channelCount} channels</span>
+          )}
+        </div>
+      )}
 
       {/* Right: status, clock, theme */}
       <div className="flex items-center gap-5">
