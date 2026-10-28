@@ -1,8 +1,9 @@
 /** Channel card — TV-optimized tile with clear focus/active/playing states */
 
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState, useMemo } from "react";
 import { cn } from "cn";
 import type { Channel } from "@/types/iptv";
+import { getChannelLogoUrl, getFallbackChannelLogoUrl } from "@/lib/image-proxy";
 
 interface ChannelCardProps {
   channel: Channel;
@@ -14,12 +15,35 @@ interface ChannelCardProps {
 export function ChannelCard({ channel, isActive, isFocused, onSelect }: ChannelCardProps) {
   const ref = useRef<HTMLButtonElement>(null);
 
+  const primaryLogo = useMemo(() => getChannelLogoUrl(channel.logo), [channel.logo]);
+  const fallbackLogo = useMemo(() => getFallbackChannelLogoUrl(channel.logo), [channel.logo]);
+  const [currentLogo, setCurrentLogo] = useState<string | undefined>(primaryLogo);
+  const [hasFailed, setHasFailed] = useState(false);
+
+  // Sync state if channel.logo prop changes
+  useEffect(() => {
+    setCurrentLogo(primaryLogo);
+    setHasFailed(false);
+  }, [primaryLogo]);
+
+  const handleImageError = () => {
+    // If Coolify primary fails and we have a wsrv.nl fallback, try fallback once
+    if (fallbackLogo && currentLogo !== fallbackLogo) {
+      setCurrentLogo(fallbackLogo);
+    } else {
+      // If fallback also fails or unavailable, show monogram
+      setHasFailed(true);
+    }
+  };
+
   // Auto-scroll focused card into view for keyboard/remote navigation
   useEffect(() => {
     if (isFocused && ref.current) {
       ref.current.scrollIntoView({ block: "nearest", behavior: "smooth" });
     }
   }, [isFocused]);
+
+  const showImage = Boolean(currentLogo && !hasFailed);
 
   return (
     <button
@@ -39,21 +63,20 @@ export function ChannelCard({ channel, isActive, isFocused, onSelect }: ChannelC
     >
       {/* Channel logo */}
       <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-md bg-muted">
-        {channel.logo ? (
+        {showImage ? (
           <img
-            src={channel.logo}
+            src={currentLogo}
             alt=""
+            loading="lazy"
+            decoding="async"
             className="h-full w-full object-contain"
-            onError={(e) => {
-              (e.target as HTMLImageElement).style.display = "none";
-              (e.target as HTMLImageElement).nextElementSibling?.classList.remove("hidden");
-            }}
+            onError={handleImageError}
           />
         ) : null}
         <span
           className={cn(
             "text-xs font-semibold text-muted-foreground",
-            channel.logo && "hidden"
+            showImage && "hidden"
           )}
         >
           {channel.name.slice(0, 2).toUpperCase()}
