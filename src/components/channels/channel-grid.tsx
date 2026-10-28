@@ -1,9 +1,9 @@
 /** Scrollable channel grid filtered by active group */
 
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Skeleton } from '@/components/ui/skeleton';
-import { ChannelCard } from '@/components/channels/channel-card';
-import type { Channel } from '@/types/iptv';
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Skeleton } from "@/components/ui/skeleton";
+import { ChannelCard } from "@/components/channels/channel-card";
+import type { Channel } from "@/types/iptv";
 
 interface ChannelGridProps {
   channels: Channel[];
@@ -22,9 +22,9 @@ export function ChannelGrid({
 }: ChannelGridProps) {
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 gap-2 p-4 sm:grid-cols-2 lg:grid-cols-3">
-        {Array.from({ length: 9 }).map((_, i) => (
-          <Skeleton key={i} className="h-16 rounded-xl" />
+      <div className="grid grid-cols-3 gap-2 p-5">
+        {Array.from({ length: 12 }).map((_, i) => (
+          <Skeleton key={i} className="h-16 rounded-lg" />
         ))}
       </div>
     );
@@ -32,15 +32,16 @@ export function ChannelGrid({
 
   if (channels.length === 0) {
     return (
-      <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
-        No channels found in this category
+      <div className="flex h-full flex-col items-center justify-center gap-2">
+        <p className="text-base text-muted-foreground">No channels found</p>
+        <p className="text-sm text-muted-foreground/60">Try selecting a different category</p>
       </div>
     );
   }
 
   return (
     <ScrollArea className="flex-1">
-      <div className="grid grid-cols-1 gap-2 p-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-3 gap-2 p-5">
         {channels.map((ch, i) => (
           <ChannelCard
             key={ch.id}

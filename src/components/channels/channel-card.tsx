@@ -1,10 +1,7 @@
-/** Individual channel card with D-Pad focus ring and logo */
+/** Channel card — TV-optimized tile with clear focus/active/playing states */
 
-import { cn } from 'cn';
-import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import type { Channel } from '@/types/iptv';
+import { cn } from "cn";
+import type { Channel } from "@/types/iptv";
 
 interface ChannelCardProps {
   channel: Channel;
@@ -15,33 +12,55 @@ interface ChannelCardProps {
 
 export function ChannelCard({ channel, isActive, isFocused, onSelect }: ChannelCardProps) {
   return (
-    <Card
-      role="button"
-      tabIndex={0}
+    <button
       onClick={() => onSelect(channel)}
-      onKeyDown={(e) => e.key === 'Enter' && onSelect(channel)}
+      onKeyDown={(e) => e.key === "Enter" && onSelect(channel)}
       className={cn(
-        'flex cursor-pointer items-center gap-3 p-3 transition-all outline-none select-none',
-        'hover:bg-accent/50 focus-visible:scale-[1.03] focus-visible:ring-2 focus-visible:ring-primary',
-        isActive && 'border-primary/40 bg-primary/15 shadow-md shadow-primary/10',
-        isFocused && 'scale-[1.03] ring-2 ring-primary',
+        "flex items-center gap-3 rounded-lg px-3.5 py-3 text-left transition-colors outline-none select-none",
+        "bg-card text-card-foreground",
+        /* Focused state: high-visibility TV outline */
+        isFocused && "outline-2 outline-offset-2 outline-tv-focus bg-tv-surface-elevated",
+        /* Active/playing state: subtle primary accent */
+        isActive && "bg-primary/10 ring-1 ring-primary/30",
+        /* Default hover for mouse fallback */
+        !isFocused && !isActive && "hover:bg-tv-surface-elevated"
       )}
     >
-      <Avatar className="h-10 w-10 shrink-0 rounded-lg">
-        <AvatarImage src={channel.logo} alt={channel.name} />
-        <AvatarFallback className="rounded-lg bg-muted text-xs font-bold">
+      {/* Channel logo */}
+      <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-md bg-muted">
+        {channel.logo ? (
+          <img
+            src={channel.logo}
+            alt=""
+            className="h-full w-full object-contain"
+            onError={(e) => {
+              (e.target as HTMLImageElement).style.display = "none";
+              (e.target as HTMLImageElement).nextElementSibling?.classList.remove("hidden");
+            }}
+          />
+        ) : null}
+        <span
+          className={cn(
+            "text-xs font-semibold text-muted-foreground",
+            channel.logo && "hidden"
+          )}
+        >
           {channel.name.slice(0, 2).toUpperCase()}
-        </AvatarFallback>
-      </Avatar>
+        </span>
+      </div>
 
+      {/* Channel info */}
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-medium">{channel.name}</p>
+        <p className="truncate text-sm font-medium leading-snug">{channel.name}</p>
         <p className="truncate text-xs text-muted-foreground">{channel.group}</p>
       </div>
 
+      {/* Playing indicator */}
       {isActive && (
-        <Badge className="shrink-0 bg-primary/20 px-1.5 text-[10px] text-primary">LIVE</Badge>
+        <span className="shrink-0 rounded-sm bg-tv-live/15 px-1.5 py-0.5 text-[11px] font-semibold text-tv-live">
+          LIVE
+        </span>
       )}
-    </Card>
+    </button>
   );
 }

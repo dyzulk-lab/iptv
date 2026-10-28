@@ -1,7 +1,7 @@
-/** Full-screen video canvas — uses avplay on Tizen TV, hls.js <video> in browser */
+/** Full-screen video stage — uses AVPlay on Tizen TV, hls.js <video> in browser */
 
-import { Loader2, PlayCircle } from 'lucide-react';
-import type { PlayerStatus } from '@/types/player';
+import { Loader2, AlertCircle, ArrowLeft } from "lucide-react";
+import type { PlayerStatus } from "@/types/player";
 
 interface VideoStageProps {
   status: PlayerStatus;
@@ -10,11 +10,10 @@ interface VideoStageProps {
 }
 
 export function VideoStage({ status, channelName, videoRef }: VideoStageProps) {
-  const isIdle = status === 'idle';
-  const isLoading = status === 'loading' || status === 'buffering';
+  const isLoading = status === "loading" || status === "buffering";
 
   return (
-    <div className="relative h-full w-full overflow-hidden rounded-xl bg-black">
+    <div className="relative flex h-full w-full items-center justify-center bg-black">
       {/* HTML5 video element (used by hls.js in browser mode) */}
       <video
         ref={videoRef}
@@ -24,28 +23,49 @@ export function VideoStage({ status, channelName, videoRef }: VideoStageProps) {
         muted={false}
       />
 
-      {/* Loading overlay */}
-      {isLoading && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/70">
-          <Loader2 className="h-10 w-10 animate-spin text-primary" />
-          <p className="text-sm text-muted-foreground">Loading {channelName || 'stream'}...</p>
+      {/* OSD: Channel info bar — visible during playback */}
+      {status === "playing" && channelName && (
+        <div className="absolute top-0 left-0 right-0 flex items-center gap-3 bg-gradient-to-b from-black/70 to-transparent px-6 py-4">
+          <h2 className="font-heading text-xl font-semibold text-white">{channelName}</h2>
+          <span className="rounded-sm bg-tv-live/20 px-1.5 py-0.5 text-xs font-semibold text-tv-live">
+            LIVE
+          </span>
         </div>
       )}
 
-      {/* Idle state — no stream selected */}
-      {isIdle && (
+      {/* Return hint */}
+      {(status === "playing" || status === "paused") && (
+        <div className="absolute bottom-0 left-0 right-0 flex items-center gap-2 bg-gradient-to-t from-black/60 to-transparent px-6 py-4 text-white/60">
+          <ArrowLeft className="h-4 w-4" />
+          <span className="text-sm">Press Back to return to channels</span>
+        </div>
+      )}
+
+      {/* Loading overlay */}
+      {isLoading && (
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/80">
-          <PlayCircle className="h-14 w-14 text-muted-foreground/40" />
-          <p className="text-sm text-muted-foreground">Select a channel to start watching</p>
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p className="text-sm text-white/60">
+            Loading {channelName || "stream"}…
+          </p>
+        </div>
+      )}
+
+      {/* Idle state */}
+      {status === "idle" && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black">
+          <p className="text-base text-white/40">Select a channel to start watching</p>
         </div>
       )}
 
       {/* Error state */}
-      {status === 'error' && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/80">
+      {status === "error" && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black">
+          <AlertCircle className="h-8 w-8 text-destructive" />
           <p className="text-sm font-medium text-destructive">
-            Playback error — try another channel
+            Playback failed
           </p>
+          <p className="text-xs text-white/40">Press Back and try another channel</p>
         </div>
       )}
     </div>
