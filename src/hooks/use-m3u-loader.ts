@@ -1,15 +1,16 @@
-/** Hook to load channels from playlists.json config or fallback to default-channels.json */
+/** Hook to load channels from playlists.json config with multi-playlist switcher support */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { toast } from 'sonner';
 import type { Channel, ChannelGroup } from '@/types/iptv';
 import { ADULT_BLACKLIST } from '@/types/iptv';
 import { parseM3U } from '@/lib/iptv/m3u-parser';
 
-interface PlaylistEntry {
+export interface PlaylistOption {
   name: string;
-  url: string;
+  url?: string;
   enabled: boolean;
+  isDefault?: boolean;
 }
 
 interface UseM3uLoaderResult {
@@ -17,8 +18,9 @@ interface UseM3uLoaderResult {
   groups: ChannelGroup[];
   isLoading: boolean;
   error: string | null;
-  playlistName: string | null;
-  loadFromUrl: (url: string) => Promise<void>;
+  playlistName: string;
+  playlists: PlaylistOption[];
+  selectPlaylist: (name: string) => Promise<void>;
 }
 
 function groupChannels(channels: Channel[]): ChannelGroup[] {
@@ -43,71 +45,120 @@ export function useM3uLoader(): UseM3uLoaderResult {
   const [groups, setGroups] = useState<ChannelGroup[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [playlistName, setPlaylistName] = useState<string | null>(null);
+  const [playlistName, setPlaylistName] = useState<string>('Test Streams');
+  const [playlists, setPlaylists] = useState<PlaylistOption[]>([]);
+  const playlistsRef = useRef<PlaylistOption[]>([]);
 
-  /** Load and apply a list of channels */
-  const applyChannels = useCallback((chs: Channel[], name: string | null) => {
-    const safe = filterSafe(chs);
-    setChannels(safe);
-    setGroups(groupChannels(safe));
-    setPlaylistName(name);
-  }, []);
-
-  /** Load channels from an external M3U URL */
-  const loadFromUrl = useCallback(async (url: string) => {
+  /** Load default test channels from public/default-channels.json */
+  const loadDefaultChannels = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
-      const res = await fetch(url);
-      const text = await res.text();
-      const parsed = parseM3U(text);
-      applyChannels(parsed, url);
+      const res = await fetch('./default-channels.json');
+      const data = await res.json();
+      const safe = filterSafe(data.channels as Channel[]);
+      setChannels(safe);
+      setGroups(groupChannels(safe));
+      setPlaylistName('Test Streams');
     } catch (err) {
-      toast.error('Failed to load playlist', { description: 'Check URL in playlists.json' });
-      setError('Failed to load playlist from URL');
-      console.error('[tv-ku] M3U load error:', err);
+      console.error('[tv-ku] Failed to load default channels:', err);
+      setError('Failed to load default channels');
+      toast.error('Failed to load default test channels');
     } finally {
       setIsLoading(false);
     }
-  }, [applyChannels]);
+  }, []);
 
-  // On mount: read playlists.json config, load first enabled playlist
+  /** Load M3U channels from a given URL */
+  const loadM3uUrl = useCallback(async (name: string, url: string) => {
+    setIsLoading(true);
+    setError(null);
+    setPlaylistName(name);
+    try {
+      console.log(`[tv-ku] Loading playlist "${name}" from ${url}...`);
+      const res = await fetch(url);
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+      }
+      const text = await res.text();
+      const parsed = parseM3U(text);
+      const safe = filterSafe(parsed);
+      setChannels(safe);
+      setGroups(groupChannels(safe));
+      console.log(`[tv-ku] Loaded ${safe.length} safe channels for "${name}".`);
+      toast.success(`Playlist "${name}" loaded`, {
+        description: `${safe.length} channels found`,
+      });
+    } catch (err) {
+      console.error(`[tv-ku] Error loading playlist "${name}":`, err);
+      setError(`Failed to load playlist: ${String(err)}`);
+      toast.error(`Failed to load playlist "${name}"`, {
+        description: 'Check connection or CORS policy. Loaded Test Streams.',
+      });
+      // Fallback to default
+      await loadDefaultChannels();
+    } finally {
+      setIsLoading(false);
+    }
+  }, [loadDefaultChannels]);
+
+  /** Switch active playlist */
+  const selectPlaylist = useCallback(async (name: string) => {
+    const target = playlistsRef.current.find((p) => p.name === name);
+    if (!target || target.isDefault || !target.url) {
+      await loadDefaultChannels();
+      return;
+    }
+    await loadM3uUrl(target.name, target.url);
+  }, [loadDefaultChannels, loadM3uUrl]);
+
+  // Initial load
   useEffect(() => {
     (async () => {
+      let available: PlaylistOption[] = [];
+      const defaultOption: PlaylistOption = {
+        name: 'Test Streams',
+        enabled: true,
+        isDefault: true,
+      };
+
       try {
-        // Try loading playlist config
         const configRes = await fetch('./playlists.json');
         if (configRes.ok) {
           const config = await configRes.json();
-          const entries: PlaylistEntry[] = config.playlists || [];
-          const active = entries.find((p) => p.enabled);
-
-          if (active) {
-            const res = await fetch(active.url);
-            const text = await res.text();
-            const parsed = parseM3U(text);
-            applyChannels(parsed, active.name);
-            setIsLoading(false);
-            return;
-          }
+          const list: PlaylistOption[] = (config.playlists || []).map((p: any) => ({
+            name: p.name,
+            url: p.url,
+            enabled: Boolean(p.enabled),
+          }));
+          available = list;
         }
       } catch (err) {
-        console.warn('[tv-ku] playlists.json not found or invalid, using default channels:', err);
+        console.warn('[tv-ku] Could not read playlists.json:', err);
       }
 
-      // Fallback: load default-channels.json
-      try {
-        const res = await fetch('./default-channels.json');
-        const data = await res.json();
-        applyChannels(data.channels as Channel[], 'Default');
-      } catch (err) {
-        setError('Failed to load channels');
-        console.error('[tv-ku] Default channels load error:', err);
-      } finally {
-        setIsLoading(false);
+      // Always append Test Streams as fallback option
+      const fullList = [...available, defaultOption];
+      playlistsRef.current = fullList;
+      setPlaylists(fullList);
+
+      // Determine starting playlist
+      const firstActive = available.find((p) => p.enabled);
+      if (firstActive && firstActive.url) {
+        await loadM3uUrl(firstActive.name, firstActive.url);
+      } else {
+        await loadDefaultChannels();
       }
     })();
-  }, [applyChannels]);
+  }, [loadDefaultChannels, loadM3uUrl]);
 
-  return { channels, groups, isLoading, error, playlistName, loadFromUrl };
+  return {
+    channels,
+    groups,
+    isLoading,
+    error,
+    playlistName,
+    playlists,
+    selectPlaylist,
+  };
 }

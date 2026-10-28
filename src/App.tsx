@@ -1,6 +1,7 @@
 /** Root application — assembles TV layout with sidebar, channel grid, and player */
 
 import { useState, useMemo, useCallback } from 'react';
+import { cn } from 'cn';
 import { TvHeader } from '@/components/layout/tv-header';
 import { TvSidebar } from '@/components/layout/tv-sidebar';
 import { ChannelGrid } from '@/components/channels/channel-grid';
@@ -12,8 +13,8 @@ import { useSpatialFocus } from '@/hooks/use-spatial-focus';
 import type { Channel } from '@/types/iptv';
 
 export function App() {
-  const { channels, groups, isLoading, playlistName } = useM3uLoader();
-  const { status, play, videoRef } = usePlayerEngine();
+  const { channels, groups, isLoading, playlistName, playlists, selectPlaylist } = useM3uLoader();
+  const { status, play, stop, videoRef } = usePlayerEngine();
   const [activeGroup, setActiveGroup] = useState<string | null>(null);
   const [activeChannel, setActiveChannel] = useState<Channel | null>(null);
   const [showPlayer, setShowPlayer] = useState(false);
@@ -29,6 +30,14 @@ export function App() {
     totalItems: filtered.length,
   });
 
+  const handleSelectPlaylist = useCallback(
+    (name: string) => {
+      setActiveGroup(null);
+      selectPlaylist(name);
+    },
+    [selectPlaylist],
+  );
+
   // Select and play a channel
   const handleSelectChannel = useCallback(
     (channel: Channel) => {
@@ -39,19 +48,32 @@ export function App() {
     [play],
   );
 
-  // TV remote key bindings
+  const handleBackFromPlayer = useCallback(() => {
+    setShowPlayer(false);
+    stop();
+  }, [stop]);
+
+  // TV remote & keyboard key bindings
   useTvKeys({
-    onUp: () => moveFocus('up'),
-    onDown: () => moveFocus('down'),
-    onLeft: () => moveFocus('left'),
-    onRight: () => moveFocus('right'),
+    onUp: () => {
+      if (!showPlayer) moveFocus('up');
+    },
+    onDown: () => {
+      if (!showPlayer) moveFocus('down');
+    },
+    onLeft: () => {
+      if (!showPlayer) moveFocus('left');
+    },
+    onRight: () => {
+      if (!showPlayer) moveFocus('right');
+    },
     onEnter: () => {
-      if (filtered[focusIndex]) {
+      if (!showPlayer && filtered[focusIndex]) {
         handleSelectChannel(filtered[focusIndex]);
       }
     },
     onReturn: () => {
-      if (showPlayer) setShowPlayer(false);
+      if (showPlayer) handleBackFromPlayer();
     },
   });
 
@@ -60,24 +82,39 @@ export function App() {
       <TvHeader playlistName={playlistName} channelCount={channels.length} />
 
       <div className="flex flex-1 overflow-hidden">
-        <TvSidebar groups={groups} activeGroup={activeGroup} onSelectGroup={setActiveGroup} />
+        <TvSidebar
+          playlists={playlists}
+          activePlaylist={playlistName}
+          onSelectPlaylist={handleSelectPlaylist}
+          groups={groups}
+          activeGroup={activeGroup}
+          onSelectGroup={setActiveGroup}
+        />
 
-        <div className="flex flex-1 flex-col overflow-hidden">
-          {showPlayer ? (
+        <div className="flex flex-1 flex-col overflow-hidden relative">
+          <ChannelGrid
+            channels={filtered}
+            activeChannel={activeChannel}
+            focusIndex={focusIndex}
+            isLoading={isLoading}
+            onSelectChannel={handleSelectChannel}
+          />
+
+          <div
+            className={cn(
+              "absolute inset-0 z-30 transition-opacity duration-150",
+              showPlayer
+                ? "opacity-100 pointer-events-auto visible"
+                : "opacity-0 pointer-events-none invisible"
+            )}
+          >
             <VideoStage
               status={status}
               channelName={activeChannel?.name ?? null}
               videoRef={videoRef}
+              onBack={handleBackFromPlayer}
             />
-          ) : (
-            <ChannelGrid
-              channels={filtered}
-              activeChannel={activeChannel}
-              focusIndex={focusIndex}
-              isLoading={isLoading}
-              onSelectChannel={handleSelectChannel}
-            />
-          )}
+          </div>
         </div>
       </div>
     </div>

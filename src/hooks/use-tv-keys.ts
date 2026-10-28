@@ -16,10 +16,16 @@ interface UseTvKeysOptions {
   onChannelDown?: KeyHandler;
 }
 
-/** Hook to listen for Samsung TV remote D-Pad and media keys */
+/** Hook to listen for Samsung TV remote D-Pad, media keys, and browser fallback keys */
 export function useTvKeys(handlers: UseTvKeysOptions) {
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
+      // Don't intercept if user is typing in an input/textarea
+      const target = e.target as HTMLElement | null;
+      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) {
+        return;
+      }
+
       const code = e.keyCode;
       let handled = false;
 
@@ -45,6 +51,8 @@ export function useTvKeys(handlers: UseTvKeysOptions) {
           handled = true;
           break;
         case TV_KEYS.RETURN:
+        case 27: // Escape key in browser
+        case 8:  // Backspace key in browser
           handlers.onReturn?.(code);
           handled = true;
           break;

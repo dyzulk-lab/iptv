@@ -7,20 +7,20 @@ interface VideoStageProps {
   status: PlayerStatus;
   channelName: string | null;
   videoRef: React.RefObject<HTMLVideoElement | null>;
+  onBack?: () => void;
 }
 
-export function VideoStage({ status, channelName, videoRef }: VideoStageProps) {
+export function VideoStage({ status, channelName, videoRef, onBack }: VideoStageProps) {
   const isLoading = status === "loading" || status === "buffering";
 
   return (
-    <div className="relative flex h-full w-full items-center justify-center bg-black">
+    <div className="relative flex h-full w-full items-center justify-center bg-black select-none">
       {/* HTML5 video element (used by hls.js in browser mode) */}
       <video
         ref={videoRef}
         className="h-full w-full object-contain"
         autoPlay
         playsInline
-        muted={false}
       />
 
       {/* OSD: Channel info bar — visible during playback */}
@@ -33,12 +33,15 @@ export function VideoStage({ status, channelName, videoRef }: VideoStageProps) {
         </div>
       )}
 
-      {/* Return hint */}
+      {/* Return hint / back action */}
       {(status === "playing" || status === "paused") && (
-        <div className="absolute bottom-0 left-0 right-0 flex items-center gap-2 bg-gradient-to-t from-black/60 to-transparent px-6 py-4 text-white/60">
+        <button
+          onClick={onBack}
+          className="absolute bottom-0 left-0 right-0 flex items-center gap-2 bg-gradient-to-t from-black/60 to-transparent px-6 py-4 text-white/60 hover:text-white transition-colors text-left cursor-pointer outline-none"
+        >
           <ArrowLeft className="h-4 w-4" />
           <span className="text-sm">Press Back to return to channels</span>
-        </div>
+        </button>
       )}
 
       {/* Loading overlay */}
@@ -65,7 +68,12 @@ export function VideoStage({ status, channelName, videoRef }: VideoStageProps) {
           <p className="text-sm font-medium text-destructive">
             Playback failed
           </p>
-          <p className="text-xs text-white/40">Press Back and try another channel</p>
+          <button
+            onClick={onBack}
+            className="text-xs text-white/60 hover:text-white transition-colors cursor-pointer outline-none underline underline-offset-4"
+          >
+            Press Back and try another channel
+          </button>
         </div>
       )}
     </div>

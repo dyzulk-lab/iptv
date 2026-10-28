@@ -1,4 +1,4 @@
-/** TV header bar — brand, playlist info, clock, and theme toggle */
+/** TV header bar — brand, playlist info, clock, network status, and theme toggle */
 
 import { useEffect, useState } from "react";
 import { Wifi } from "lucide-react";

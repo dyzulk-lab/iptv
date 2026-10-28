@@ -40,11 +40,11 @@ export function ChannelGrid({
   }
 
   return (
-    <ScrollArea className="flex-1">
+    <ScrollArea className="flex-1 h-full min-h-0">
       <div className="grid grid-cols-3 gap-2 p-5">
         {channels.map((ch, i) => (
           <ChannelCard
-            key={ch.id}
+            key={ch.id || `${ch.name}-${i}`}
             channel={ch}
             isActive={activeChannel?.id === ch.id}
             isFocused={focusIndex === i}
