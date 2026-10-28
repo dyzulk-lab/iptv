@@ -1,7 +1,7 @@
 /** Hook for dual-engine video player (AVPlay on Samsung Tizen TV, hls.js in browser) */
 
 import { useState, useCallback, useRef, useEffect } from 'react';
-import Hls from 'hls.js';
+import type Hls from 'hls.js';
 import { toast } from 'sonner';
 import { isTizenTV } from '@/lib/tizen/key-codes';
 import { avplayOpen, avplayPause, avplayResume, avplayStop } from '@/lib/tizen/avplay-engine';
@@ -33,7 +33,7 @@ export function usePlayerEngine(): UsePlayerEngineResult {
     };
   }, []);
 
-  const playInBrowser = useCallback((url: string, video: HTMLVideoElement) => {
+  const playInBrowser = useCallback(async (url: string, video: HTMLVideoElement) => {
     console.log('[tv-ku] Starting browser playback for:', url);
 
     // Destroy existing hls instance
@@ -49,72 +49,81 @@ export function usePlayerEngine(): UsePlayerEngineResult {
 
     const isHlsUrl = url.includes('.m3u8') || url.includes('/hls/') || url.includes('playlist');
 
-    if (Hls.isSupported() && isHlsUrl) {
-      console.log('[tv-ku] Initializing hls.js player engine');
-      const hls = new Hls({
-        maxBufferLength: 30,
-        enableWorker: true,
-        lowLatencyMode: true,
-      });
+    if (isHlsUrl) {
+      try {
+        const { default: Hls } = await import('hls.js');
 
-      hlsRef.current = hls;
-      hls.loadSource(url);
-      hls.attachMedia(video);
+        if (Hls.isSupported()) {
+          console.log('[tv-ku] Initializing hls.js player engine');
+          const hls = new Hls({
+            maxBufferLength: 30,
+            enableWorker: true,
+            lowLatencyMode: true,
+          });
 
-      hls.on(Hls.Events.MANIFEST_PARSED, () => {
-        console.log('[tv-ku] HLS manifest parsed successfully. Attempting playback...');
-        const playPromise = video.play();
-        if (playPromise !== undefined) {
-          playPromise
-            .then(() => {
-              console.log('[tv-ku] Playback started');
-              setStatus('playing');
-            })
-            .catch((err) => {
-              console.warn('[tv-ku] Autoplay with sound blocked by browser, muting and retrying:', err);
-              video.muted = true;
-              video.play()
+          hlsRef.current = hls;
+          hls.loadSource(url);
+          hls.attachMedia(video);
+
+          hls.on(Hls.Events.MANIFEST_PARSED, () => {
+            console.log('[tv-ku] HLS manifest parsed successfully. Attempting playback...');
+            const playPromise = video.play();
+            if (playPromise !== undefined) {
+              playPromise
                 .then(() => {
+                  console.log('[tv-ku] Playback started');
                   setStatus('playing');
-                  toast.info('Audio muted due to browser autoplay policy, click video to unmute');
                 })
-                .catch((e) => {
-                  console.error('[tv-ku] Autoplay failed even when muted:', e);
-                  setStatus('error');
+                .catch((err) => {
+                  console.warn('[tv-ku] Autoplay with sound blocked by browser, muting and retrying:', err);
+                  video.muted = true;
+                  video.play()
+                    .then(() => {
+                      setStatus('playing');
+                      toast.info('Audio muted due to browser autoplay policy, click video to unmute');
+                    })
+                    .catch((e) => {
+                      console.error('[tv-ku] Autoplay failed even when muted:', e);
+                      setStatus('error');
+                    });
                 });
-            });
-        }
-      });
+            }
+          });
 
-      hls.on(Hls.Events.ERROR, (_, data) => {
-        console.warn('[tv-ku] HLS Event Error:', data.type, data.details, data);
-        if (data.fatal) {
-          console.error('[tv-ku] Fatal HLS error encountered:', data.type, data.details);
-          switch (data.type) {
-            case Hls.ErrorTypes.NETWORK_ERROR:
-              console.error(
-                '[tv-ku] Network error loading stream chunks. Reason:',
-                data.details,
-                '- Note: Desktop browser testing enforces CORS. On Samsung TV AVPlay this restriction is bypassed.'
-              );
-              toast.error('Stream failed to load (Network/CORS)', {
-                description: 'The stream server may be offline or blocking browser CORS requests.',
-              });
-              setStatus('error');
-              break;
-            case Hls.ErrorTypes.MEDIA_ERROR:
-              console.log('[tv-ku] Recovering from fatal media error...');
-              hls.recoverMediaError();
-              break;
-            default:
-              toast.error('Playback failed', { description: data.details });
-              setStatus('error');
-              hls.destroy();
-              break;
-          }
+          hls.on(Hls.Events.ERROR, (_, data) => {
+            console.warn('[tv-ku] HLS Event Error:', data.type, data.details, data);
+            if (data.fatal) {
+              console.error('[tv-ku] Fatal HLS error encountered:', data.type, data.details);
+              switch (data.type) {
+                case Hls.ErrorTypes.NETWORK_ERROR:
+                  console.error(
+                    '[tv-ku] Network error loading stream chunks. Reason:',
+                    data.details,
+                    '- Note: Desktop browser testing enforces CORS. On Samsung TV AVPlay this restriction is bypassed.'
+                  );
+                  toast.error('Stream failed to load (Network/CORS)', {
+                    description: 'The stream server may be offline or blocking browser CORS requests.',
+                  });
+                  setStatus('error');
+                  break;
+                case Hls.ErrorTypes.MEDIA_ERROR:
+                  console.log('[tv-ku] Recovering from fatal media error...');
+                  hls.recoverMediaError();
+                  break;
+                default:
+                  toast.error('Playback failed', { description: data.details });
+                  setStatus('error');
+                  hls.destroy();
+                  break;
+              }
+            }
+          });
+          return;
         }
-      });
-    } else {
+      } catch (err) {
+        console.error('[tv-ku] Failed to load Hls module dynamically:', err);
+      }
+    }
       // Native video support (Safari iOS/macOS or direct MP4/stream)
       console.log('[tv-ku] Loading via native HTML5 video element');
       video.src = url;
@@ -146,7 +155,6 @@ export function usePlayerEngine(): UsePlayerEngineResult {
         });
         setStatus('error');
       };
-    }
   }, []);
 
   const play = useCallback((url: string) => {
