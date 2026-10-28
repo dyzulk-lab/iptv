@@ -30,7 +30,7 @@ export function TvSidebar({
   focusedIndex,
 }: TvSidebarProps) {
   return (
-    <aside className="flex w-60 shrink-0 flex-col border-r border-border bg-sidebar select-none h-full overflow-hidden">
+    <aside className="flex w-64 shrink-0 flex-col border-r border-border bg-sidebar select-none h-full overflow-hidden">
       <ScrollArea className="flex-1 h-full">
         <div className="py-2">
           {/* 1. Playlists section */}
@@ -169,15 +169,10 @@ export function TvSidebar({
                         "outline-2 outline-offset-[-2px] outline-tv-focus bg-sidebar-accent"
                     )}
                   >
-                    <div className="flex items-center gap-2 truncate flex-1 mr-2">
-                      <span className="font-mono text-[9px] text-muted-foreground/60 w-3.5 text-right shrink-0">
-                        {i + 1}
-                      </span>
-                      <span className={cn("truncate", isUndefinedGroup && "italic opacity-80")}>
-                        {group.name}
-                      </span>
-                    </div>
-                    <span className="text-[11px] tabular-nums font-mono text-muted-foreground shrink-0">
+                    <span className={cn("min-w-0 flex-1 truncate", isUndefinedGroup && "italic opacity-80")}>
+                      {group.name}
+                    </span>
+                    <span className="shrink-0 tabular-nums ml-2 font-mono text-[11px] text-muted-foreground">
                       {group.channels.length}
                     </span>
                   </button>

@@ -9,7 +9,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { sanitizeCategory } from './lib/sanitizer.js';
+import { sanitizeCategories } from './lib/sanitizer.js';
 import { fetchPlaylistChannels } from './lib/fetcher.js';
 import { isAdultContent } from './lib/parser.js';
 import type {
@@ -97,20 +97,24 @@ async function main() {
 
   console.log(`\n📊 Total raw unique channels gathered: ${collected.length}`);
 
-  // 3. Normalize categories and assign index numbers
+  // 3. Normalize categories (many-to-many fan-out) and assign index numbers
   const groupMap = new Map<string, ChannelItem[]>();
 
   const numberedChannels: ChannelItem[] = collected.map((ch, idx) => {
-    const cleanGroup = sanitizeCategory(ch.group);
+    const atomicCategories = sanitizeCategories(ch.group);
     const item: ChannelItem = {
       ...ch,
       number: idx + 1,
-      group: cleanGroup,
+      group: atomicCategories[0], // primary category (backward compat)
+      categories: atomicCategories,
     };
 
-    const list = groupMap.get(cleanGroup) || [];
-    list.push(item);
-    groupMap.set(cleanGroup, list);
+    // Fan-out: register this channel in EVERY atomic category group
+    for (const cat of atomicCategories) {
+      const list = groupMap.get(cat) || [];
+      list.push(item);
+      groupMap.set(cat, list);
+    }
 
     return item;
   });

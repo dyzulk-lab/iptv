@@ -13,6 +13,8 @@ export interface RawChannel {
 export interface ChannelItem extends RawChannel {
   number: number;
   group: string;
+  /** All atomic categories this channel belongs to (many-to-many) */
+  categories: string[];
 }
 
 export interface ChannelGroup {

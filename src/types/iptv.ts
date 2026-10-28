@@ -7,6 +7,8 @@ export interface Channel {
   url: string;
   logo?: string;
   group: string;
+  /** All atomic categories this channel belongs to (many-to-many) */
+  categories?: string[];
   tvgId?: string;
   tvgName?: string;
 }
@@ -15,6 +17,7 @@ export type CategorySortMode = 'index' | 'az' | 'count';
 
 export interface ChannelGroup {
   name: string;
+  count?: number;
   channels: Channel[];
 }
 

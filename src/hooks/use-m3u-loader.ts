@@ -62,11 +62,18 @@ export function useM3uLoader(): UseM3uLoaderResult {
         return false;
       }
 
-      // Flatten channels from categories or construct flat list
+      // Flatten channels from categories, deduplicating by URL
+      // (many-to-many: same channel can appear in multiple categories)
       const allChannels: Channel[] = [];
+      const seenUrls = new Set<string>();
       for (const cat of data.categories) {
         if (Array.isArray(cat.channels)) {
-          allChannels.push(...cat.channels);
+          for (const ch of cat.channels) {
+            if (!seenUrls.has(ch.url)) {
+              seenUrls.add(ch.url);
+              allChannels.push(ch);
+            }
+          }
         }
       }
 
