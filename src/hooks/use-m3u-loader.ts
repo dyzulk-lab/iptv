@@ -181,9 +181,20 @@ export function useM3uLoader(): UseM3uLoaderResult {
       enabled: true,
       isCatalog: true,
     };
+    let isDefaultEnabled = false;
+    try {
+      const defRes = await fetch('./default-channels.json');
+      if (defRes.ok) {
+        const defData = await defRes.json();
+        isDefaultEnabled = Boolean(defData.enabled);
+      }
+    } catch (err) {
+      console.warn('[tv-ku] Could not read default-channels.json:', err);
+    }
+
     const defaultOption: PlaylistOption = {
       name: 'Test Streams',
-      enabled: true,
+      enabled: isDefaultEnabled,
       isDefault: true,
     };
 

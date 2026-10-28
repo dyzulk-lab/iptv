@@ -54,14 +54,21 @@ async function main() {
   if (fs.existsSync(defaultChannelsPath)) {
     try {
       const defaultData = JSON.parse(fs.readFileSync(defaultChannelsPath, 'utf-8'));
-      const list: RawChannel[] = defaultData.channels || [];
-      for (const ch of list) {
-        if (!seenUrls.has(ch.url) && !isAdultContent(`${ch.name} ${ch.group}`)) {
-          seenUrls.add(ch.url);
-          collected.push(ch);
+      if (defaultData.enabled === false) {
+        console.log('⏩ Skipping disabled default-channels.json');
+      } else {
+        const list: RawChannel[] = defaultData.channels || [];
+        let addedCount = 0;
+        for (const ch of list) {
+          if (ch.enabled === false) continue;
+          if (!seenUrls.has(ch.url) && !isAdultContent(`${ch.name} ${ch.group}`)) {
+            seenUrls.add(ch.url);
+            collected.push(ch);
+            addedCount++;
+          }
         }
+        console.log(`✔ Loaded ${addedCount} channels from default-channels.json`);
       }
-      console.log(`✔ Loaded ${list.length} channels from default-channels.json`);
     } catch (err) {
       console.warn('⚠️  Could not read default-channels.json:', err);
     }

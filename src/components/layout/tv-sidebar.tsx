@@ -29,21 +29,23 @@ export function TvSidebar({
   onSelectSortMode,
   focusedIndex,
 }: TvSidebarProps) {
+  const enabledPlaylists = playlists.filter((pl) => pl.enabled);
+
   return (
     <aside className="flex w-64 shrink-0 flex-col border-r border-border bg-sidebar select-none h-full overflow-hidden">
       <ScrollArea className="flex-1 h-full">
         <div className="py-2">
-          {/* 1. Playlists section */}
-          {playlists.length > 0 && (
+          {/* 1. Playlists section (shown only when multiple playlists/sources are enabled) */}
+          {enabledPlaylists.length > 1 && (
             <div className="pb-1">
               <div className="flex items-center justify-between px-4 pb-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
                 <span>Playlists</span>
                 <span className="text-[10px] tabular-nums font-mono opacity-70">
-                  ({playlists.length})
+                  ({enabledPlaylists.length})
                 </span>
               </div>
               <div className="flex flex-col py-0.5">
-                {playlists.map((pl) => {
+                {enabledPlaylists.map((pl) => {
                   const isPlActive = activePlaylist === pl.name;
                   return (
                     <button
@@ -76,7 +78,7 @@ export function TvSidebar({
             </div>
           )}
 
-          {playlists.length > 0 && <div className="mx-4 my-2 border-t border-border" />}
+          {enabledPlaylists.length > 1 && <div className="mx-4 my-2 border-t border-border" />}
 
           {/* 2. Categories & Sort Options */}
           <div>

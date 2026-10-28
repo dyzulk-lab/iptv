@@ -8,6 +8,7 @@ export interface RawChannel {
   group?: string;
   tvgId?: string;
   tvgName?: string;
+  enabled?: boolean;
 }
 
 export interface ChannelItem extends RawChannel {

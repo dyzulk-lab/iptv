@@ -1,6 +1,7 @@
 {
   "name": "tv-ku Default Channels",
   "description": "Verified public test and live streams with CORS support",
+  "enabled": false,
   "lastUpdated": "2026-10-28",
   "channels": [
     {
